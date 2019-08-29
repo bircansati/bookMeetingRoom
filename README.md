@@ -2,7 +2,7 @@
 
 Django-Rest-Framework MeetingRoom booking app
 
-###Search Available Rooms
+##Search Available Rooms
 
 Make a post request at 
 
@@ -36,7 +36,7 @@ example response
 >}
 
 
-###Booking a room
+##Booking a room
 Make a post request at
 >localhost/api/bookroom
 >
