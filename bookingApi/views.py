@@ -49,8 +49,22 @@ class BookRoom(APIView):
     def post(self, request, format=None):
         serializer = BookingSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            entries = Room.objects.filter(
+                Q(booking__date_start__lte=serializer.validated_data.get('date_start')) &
+                Q(booking__date_end__gte=serializer.validated_data.get('date_end'))
+            )
+            entries1 = Room.objects.filter(
+                Q(booking__date_start__range=(
+                    serializer.validated_data.get('date_start'), serializer.validated_data.get('date_end'))) |
+                Q(booking__date_end__range=(
+                    serializer.validated_data.get('date_start'), serializer.validated_data.get('date_end'))))
+            entries1 = entries | entries1
+            if (entries1):
+                return Response(serializer.errors, status.HTTP_406_NOT_ACCEPTABLE)
+
+            else:
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

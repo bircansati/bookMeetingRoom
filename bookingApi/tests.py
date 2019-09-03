@@ -63,7 +63,7 @@ class AvailabilityTestCase(APITestCase):
                                               date_start="2019-09-02T20:00:00Z",
                                               date_end="2019-09-02T21:00:00Z")
 
-    def test_availability_exact_booking(self):
+    def test_availability_not_available_exact_booking(self):
         request_data = {
             "room_id": "room1",
             "number_of_people": 3,
@@ -73,7 +73,7 @@ class AvailabilityTestCase(APITestCase):
         response = self.client.post(self.url, request_data, format="json")
         self.assertEqual(400, response.status_code)
 
-    def test_availability_between_start_and_end(self):
+    def test_availability_not_available_between_start_and_end(self):
         request_data = {
             "room_id": "room1",
             "number_of_people": 3,
@@ -83,7 +83,7 @@ class AvailabilityTestCase(APITestCase):
         response = self.client.post(self.url, request_data, format="json")
         self.assertEqual(400, response.status_code)
 
-    def test_availability_gt_start_gt_end(self):
+    def test_availability_not_available_gt_start_gt_end(self):
         request_data = {
             "room_id": "room1",
             "number_of_people": 3,
@@ -93,7 +93,7 @@ class AvailabilityTestCase(APITestCase):
         response = self.client.post(self.url, request_data, format="json")
         self.assertEqual(400, response.status_code)
 
-    def test_availability_lt_start_lt_end(self):
+    def test_availability_not_available_lt_start_lt_end(self):
         request_data = {
             "room_id": "room1",
             "number_of_people": 3,
@@ -130,19 +130,33 @@ class BookingTestCase(APITestCase):
         self.room1 = Room.objects.create(user=self.user, room_id="room1", room_capacity=8)
         self.room2 = Room.objects.create(user=self.user, room_id="room2", room_capacity=3)
 
-    def test_booking_available_room(self):
+        self.booking = Booking.objects.create(room_id=self.room1,
+                                              number_of_people=3,
+                                              date_start="2019-09-02T20:00:00Z",
+                                              date_end="2019-09-02T21:00:00Z")
+
+    def test_booking_room_valid_date(self):
         request_data = {
             "room_id": "room1",
             "number_of_people": 3,
-            "date_start": "2019-09-02T21:00:00Z",
+            "date_start": "2019-09-02T21:10:00Z",
             "date_end": "2019-09-02T23:00:00Z"
         }
         response = self.client.post(self.url, request_data, format='json')
         self.assertEqual(201, response.status_code)
+    def test_booking_room_invalid_date(self):
+        request_data = {
+            "room_id": "room1",
+            "number_of_people": 3,
+            "date_start": "2019-09-02T20:20:00Z",
+            "date_end": "2019-09-02T21:00:00Z"
+        }
+        response = self.client.post(self.url, request_data, format='json')
+        self.assertEqual(406, response.status_code)
 
 class RoomTestCase(APITestCase):
     """
-        Test module for one to many relationship
+        Test module for creating rooms and relationships
     """
     def setUp(self):
         # Create user for adding meeting rooms
@@ -154,7 +168,14 @@ class RoomTestCase(APITestCase):
 
         # Create meeting rooms for booking
 
-
+    def test_create_room_valid_user(self):
+        self.room1 = Room.objects.create(user=self.user, room_id="room1", room_capacity=8)
+        self.assertTrue((Room.objects.filter(room_id="room1")))
+    def test_create_room_invalid_user(self):
+        try:
+            self.room1 = Room.objects.create(user="testUser", room_id="room1", room_capacity=8)
+        except ValueError as Argument:
+            self.assertTrue('"Room.user" must be a "User" instance' in str(Argument))
     def test_a_client_can_have_n_number_of_rooms(self):
         try:
             self.room1 = Room.objects.create(user=self.user, room_id="room1", room_capacity=8)
