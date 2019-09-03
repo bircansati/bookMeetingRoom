@@ -65,7 +65,6 @@ class AvailabilityTestCase(APITestCase):
 
     def test_availability_not_available_exact_booking(self):
         request_data = {
-            "room_id": "room1",
             "number_of_people": 3,
             "date_start": "2019-09-02T20:00:00Z",
             "date_end": "2019-09-02T21:00:00Z"
@@ -75,7 +74,6 @@ class AvailabilityTestCase(APITestCase):
 
     def test_availability_not_available_between_start_and_end(self):
         request_data = {
-            "room_id": "room1",
             "number_of_people": 3,
             "date_start": "2019-09-02T20:10:00Z",
             "date_end": "2019-09-02T20:50:00Z"
@@ -85,7 +83,6 @@ class AvailabilityTestCase(APITestCase):
 
     def test_availability_not_available_gt_start_gt_end(self):
         request_data = {
-            "room_id": "room1",
             "number_of_people": 3,
             "date_start": "2019-09-02T20:10:00Z",
             "date_end": "2019-09-02T22:30:00Z"
@@ -95,7 +92,6 @@ class AvailabilityTestCase(APITestCase):
 
     def test_availability_not_available_lt_start_lt_end(self):
         request_data = {
-            "room_id": "room1",
             "number_of_people": 3,
             "date_start": "2019-09-02T19:10:00Z",
             "date_end": "2019-09-02T20:30:00Z"
@@ -105,7 +101,6 @@ class AvailabilityTestCase(APITestCase):
 
     def test_availability_available(self):
         request_data = {
-            "room_id": "room1",
             "number_of_people": 3,
             "date_start": "2019-09-02T15:10:00Z",
             "date_end": "2019-09-02T16:30:00Z"

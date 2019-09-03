@@ -27,5 +27,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('bookingApi.urls', namespace='bookingApi')),
 
-    
+
 ]
