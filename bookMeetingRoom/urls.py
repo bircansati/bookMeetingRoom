@@ -21,11 +21,9 @@ from bookingApi import views
 
 router = DefaultRouter()
 router.register(r'booking', views.BookingViewSet)
-router.register(r'room', views.RoomViewSet)
+router.register(r'room', views.RoomViewSet, base_name='room')
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/availablerooms/', views.AvailableRooms.as_view()),
-    path('api/bookroom/',views.BookRoom.as_view()),
-    path('api/', include(router.urls))
-
+    path('api/', include('bookingApi.urls', namespace='bookingApi')),
 ]
