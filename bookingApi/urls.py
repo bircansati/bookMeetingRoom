@@ -13,4 +13,6 @@ urlpatterns = [
     path('availablerooms/', AvailableRooms.as_view(), name="availablerooms"),
     path('bookroom/', BookRoom.as_view(), name="bookroom"),
     path('', include(router.urls))
+
+
 ]
