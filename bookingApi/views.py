@@ -14,11 +14,16 @@ class AvailableRooms(APIView):
     def post(self, request, format=None):
         serializer = BookingSearchSerializer(data=request.data)
         if serializer.is_valid():
-            entries1 = Room.objects.filter(
-                Q(booking__date_start__gte=serializer.data.get('date_start')) &
-                Q(booking__date_end__lte=serializer.data.get('date_end'))
+            entries = Room.objects.filter(
+                Q(booking__date_start__lte=serializer.data.get('date_start')) &
+                Q(booking__date_end__gte=serializer.data.get('date_end'))
             )
+            entries1 = Room.objects.filter(
+                Q(booking__date_start__range=(serializer.data.get('date_start'), serializer.data.get('date_end'))) |
+                Q(booking__date_end__range=(serializer.data.get('date_start'), serializer.data.get('date_end'))))
+            entries1 = entries | entries1
             entries2 = Room.objects.exclude(room_id__in=entries1)
+
             if not entries2:
                 Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             else:
@@ -45,9 +50,10 @@ class BookRoom(APIView):
         serializer = BookingSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class BookingViewSet(viewsets.ModelViewSet):
     queryset = Booking.objects.all()
